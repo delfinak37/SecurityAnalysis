@@ -20,11 +20,28 @@ jobs:
         uses: KoharaKazuya/marp-cli-action@v4
         with:
           config-file: ./.marprc.yml
-        
+
+      # 👇 Страховка: проверяем, что index.html лежит в корне
+      - name: Ensure index.html exists at root
+        run: |
+          if [ -f "index.html" ]; then
+            echo "✅ index.html already at root. All good."
+          else
+            echo "⚠️ index.html not found at root. Searching..."
+            GENERATED_HTML=$(find . -maxdepth 3 -name "*.html" -not -path "./.git/*" | head -n 1)
+            if [ -n "$GENERATED_HTML" ]; then
+              echo "Found: $GENERATED_HTML. Copying to ./index.html"
+              cp "$GENERATED_HTML" ./index.html
+            else
+              echo "❌ No HTML file generated at all. Check Marp config."
+              exit 1
+            fi
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: . # Загружаем все собранные файлы
+          path: . # Загружаем всю корневую папку, где теперь точно есть index.html
 
   deploy:
     needs: build
