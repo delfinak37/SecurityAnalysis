@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Convert Markdown to HTML
-        uses: KoharaKazuya/marp-cli-action@v4
-        with:
-          config-file: ./.marprc.yml
+        run: |
+          mkdir -p dist
+          docker run --rm -v $PWD:/home/marp/app/ -e MARP_USER="$(id -u):$(id -g)" marpteam/marp-cli "3. ИСМУСЭ.md" -o dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: . 
+          path: ./dist
 
   deploy:
     needs: build
