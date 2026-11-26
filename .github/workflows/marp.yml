@@ -19,8 +19,8 @@ jobs:
       - name: Convert Markdown to HTML
         uses: KoharaKazuya/marp-cli-action@v4
         with:
-          args: "3. ИСМУСЭ.md -o Лекция.html"
-
+          config-file: ./.marprc.yml
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
