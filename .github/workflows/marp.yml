@@ -3,8 +3,8 @@ name: Build Marp Presentation
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'output/**'
+    paths:
+      - '3. ИСМУСЭ.md'
   workflow_dispatch:
 
 permissions:
