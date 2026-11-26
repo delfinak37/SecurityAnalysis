@@ -3,10 +3,12 @@ name: Build Marp Presentation
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'output/**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -15,11 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Convert Markdown to HTML
+      
+      - name: Convert Markdown to HTML and PPTX
         run: |
-          mkdir -p dist
+          mkdir -p dist output
           docker run --rm -v $PWD:/home/marp/app/ -e MARP_USER="$(id -u):$(id -g)" marpteam/marp-cli "3. ИСМУСЭ.md" -o dist/index.html
+          docker run --rm -v $PWD:/home/marp/app/ -e MARP_USER="$(id -u):$(id -g)" marpteam/marp-cli "3. ИСМУСЭ.md" --pptx --allow-local-files -o "output/3. ИСМУСЭ.pptx"
+
+      - name: Save PPTX to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@://github.com"
+          git add output/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Обновление PPTX презентации" && git push)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
